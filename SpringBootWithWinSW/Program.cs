@@ -55,7 +55,7 @@ namespace SpringBootWithWinSW
             SetXElementValue(rootXElement, "id", id);
             SetXElementValue(rootXElement, "name", id);
             SetXElementValue(rootXElement, "description", id);
-            SetXElementValue(rootXElement, "executable", "jar");
+            SetXElementValue(rootXElement, "executable", "java");
             SetXElementValue(rootXElement, "arguments", $"-jar {jarFile}");
 
             rootXElement.Save(configFile);
