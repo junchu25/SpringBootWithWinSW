@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Xml.Linq;
 
 namespace SpringBootWithWinSW
 {
@@ -34,6 +35,7 @@ namespace SpringBootWithWinSW
             var winswSource = ConfigurationManager.AppSettings["winswSource"];
 
             CopyWinSWToDeployFolder(id, winswSource, jarFolder);
+            UpdateWinSWConfig(id, jarFolder, jarFile);
         }
 
         static void CopyWinSWToDeployFolder(string id, string winswSource, string destFolder)
@@ -41,8 +43,36 @@ namespace SpringBootWithWinSW
             var winswExeFile = Path.Combine(winswSource, "WinSW.NET4.exe");
             var winswConfigFile = Path.Combine(winswSource, "sample-allOptions.xml");
 
-            File.Copy(winswExeFile, Path.Combine(destFolder, $"{id}.exe"));
-            File.Copy(winswConfigFile, Path.Combine(destFolder, $"{id}.xml"));
+            File.Copy(winswExeFile, Path.Combine(destFolder, $"{id}.exe"), true);
+            File.Copy(winswConfigFile, Path.Combine(destFolder, $"{id}.xml"), true);
+        }
+
+        static void UpdateWinSWConfig(string id, string path, string jarFile)
+        {
+            var configFile = Path.Combine(path, $"{id}.xml");
+            var rootXElement = XElement.Load(configFile);
+
+            SetXElementValue(rootXElement, "id", id);
+            SetXElementValue(rootXElement, "name", id);
+            SetXElementValue(rootXElement, "description", id);
+            SetXElementValue(rootXElement, "executable", "jar");
+            SetXElementValue(rootXElement, "arguments", $"-jar {jarFile}");
+
+            rootXElement.Save(configFile);
+        }
+
+        static void SetXElementValue(XElement rootXElement, XName name, string value)
+        {
+            var xElement = rootXElement.Element(name);
+
+            if (xElement != null)
+            {
+                xElement.Value = value;
+            }
+            else
+            {
+                rootXElement.Add(new XElement(name, value));
+            }
         }
     }
 }
