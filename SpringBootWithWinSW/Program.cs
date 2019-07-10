@@ -18,10 +18,24 @@ namespace SpringBootWithWinSW
         static IDictionary<string, string> ParseArguments(string[] args)
         {
             var map = new Dictionary<string, string>();
+            map.Add("options", String.Empty);
 
-            for (var i = 0; i < args.Length; i += 2)
+            for (var i = 0; i < args.Length; ++i)
             {
-                map.Add(args[i].Substring(1), args[i + 1]);
+                var argName = args[i].ToLower();
+
+                if (argName == "-id")
+                {
+                    map.Add("id", args[++i]);
+                }
+                else if (argName == "-file")
+                {
+                    map.Add("file", args[++i]);
+                }
+                else
+                {
+                    map["options"] += argName;
+                }
             }
 
             return map;
@@ -31,11 +45,12 @@ namespace SpringBootWithWinSW
         {
             var id = args["id"];
             var jarFile = args["file"];
+            var options = args["options"];
             var jarFolder = Path.GetDirectoryName(jarFile);
             var winswSource = ConfigurationManager.AppSettings["winswSource"];
 
             CopyWinSWToDeployFolder(id, winswSource, jarFolder);
-            UpdateWinSWConfig(id, jarFolder, jarFile);
+            UpdateWinSWConfig(id, jarFolder, jarFile, options);
         }
 
         static void CopyWinSWToDeployFolder(string id, string winswSource, string destFolder)
@@ -47,7 +62,7 @@ namespace SpringBootWithWinSW
             File.Copy(winswConfigFile, Path.Combine(destFolder, $"{id}.xml"), true);
         }
 
-        static void UpdateWinSWConfig(string id, string path, string jarFile)
+        static void UpdateWinSWConfig(string id, string path, string jarFile, string options)
         {
             var configFile = Path.Combine(path, $"{id}.xml");
             var rootXElement = XElement.Load(configFile);
@@ -56,7 +71,7 @@ namespace SpringBootWithWinSW
             SetXElementValue(rootXElement, "name", id);
             SetXElementValue(rootXElement, "description", id);
             SetXElementValue(rootXElement, "executable", "java");
-            SetXElementValue(rootXElement, "arguments", $"-jar {jarFile}");
+            SetXElementValue(rootXElement, "arguments", $"-jar {jarFile} {options}");
 
             rootXElement.Save(configFile);
         }
