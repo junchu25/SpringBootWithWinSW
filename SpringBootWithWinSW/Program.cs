@@ -66,7 +66,7 @@ namespace SpringBootWithWinSW
         {
             var configFile = Path.Combine(path, $"{id}.xml");
             var rootXElement = XElement.Load(configFile);
-            var javaOpts = Environment.GetEnvironmentVariable("JAVA_OPTS") ?? "-Xms128m -Xmx750m";
+            var javaOpts = Environment.GetEnvironmentVariable("SPRING_BOOT_JAVA_OPTS") ?? "-Xms128m -Xmx750m";
 
             SetXElementValue(rootXElement, "id", id);
             SetXElementValue(rootXElement, "name", id);
