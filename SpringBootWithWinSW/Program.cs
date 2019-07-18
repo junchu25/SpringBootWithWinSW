@@ -66,12 +66,13 @@ namespace SpringBootWithWinSW
         {
             var configFile = Path.Combine(path, $"{id}.xml");
             var rootXElement = XElement.Load(configFile);
+            var javaOpts = Environment.GetEnvironmentVariable("JAVA_OPTS") ?? "-Xms128m -Xmx256m";
 
             SetXElementValue(rootXElement, "id", id);
             SetXElementValue(rootXElement, "name", id);
             SetXElementValue(rootXElement, "description", id);
             SetXElementValue(rootXElement, "executable", "java");
-            SetXElementValue(rootXElement, "arguments", $"-jar {jarFile} {options}");
+            SetXElementValue(rootXElement, "arguments", $"-jar {javaOpts} {jarFile} {options}");
 
             rootXElement.Save(configFile);
         }
